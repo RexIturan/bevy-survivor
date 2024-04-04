@@ -4,7 +4,11 @@ mod camera;
 mod scene;
 
 use bevy::prelude::*;
-use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
+use bevy::diagnostic::{
+    FrameTimeDiagnosticsPlugin,
+    EntityCountDiagnosticsPlugin,
+    SystemInformationDiagnosticsPlugin
+};
 
 use iyes_perf_ui::prelude::*;
 
@@ -14,8 +18,8 @@ fn main() {
 
 
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
-        .add_plugins(bevy::diagnostic::EntityCountDiagnosticsPlugin)
-        .add_plugins(bevy::diagnostic::SystemInformationDiagnosticsPlugin)
+        .add_plugins(EntityCountDiagnosticsPlugin)
+        .add_plugins(SystemInformationDiagnosticsPlugin)
 
         // 3rd party plugins
         .add_plugins(PerfUiPlugin)
