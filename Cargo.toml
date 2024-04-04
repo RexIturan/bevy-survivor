@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 # remove dynamic_linking for release
 bevy = { version = "0.13.1", features = ["dynamic_linking"] }
+iyes_perf_ui = "0.2.3"
+rand = "0.9.0-alpha.1"
 
 
 # Enable a small amount of optimization in debug mode
