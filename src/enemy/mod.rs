@@ -1,7 +1,7 @@
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use bevy::prelude::*;
 
-const NUM_ENEMIES: usize = 30000;
+const NUM_ENEMIES: usize = 10000;
 
 ///// PlugIn /////
 pub struct EnemyPlugin;

@@ -26,10 +26,9 @@ fn main() {
         .add_systems(Startup, setup)
 
         // own plugins
-        .add_plugins(tutorial::HelloPlugin)
-        .add_plugins(enemy::EnemyPlugin)
-        .add_plugins(camera::CameraPlugin)
         .add_plugins(scene::ScenePlugin)
+        .add_plugins(camera::CameraPlugin)
+        .add_plugins(enemy::EnemyPlugin)
 
         .run();
 }
