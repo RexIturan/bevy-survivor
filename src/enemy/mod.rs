@@ -25,8 +25,23 @@ fn setup(
     let vel_range = -0.5..0.5;
 
     let mut rng = StdRng::seed_from_u64(19878367467713);
-    let mesh_handle = meshes.add(Cuboid::new(0.1, 0.1, 0.1));
+    let mesh_handle = meshes.add(Cuboid::new(1.0, 1.0, 1.0));
     let mat_handle = materials.add(Color::CRIMSON);
+
+    commands.spawn(EnemyBundle {
+        visuals: PbrBundle {
+            mesh: mesh_handle.clone(),
+            material: mat_handle.clone(),
+            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+            ..default()
+        },
+        velocity: Velocity( Vec3::new(
+            rng.gen_range(vel_range.clone()),
+            0.,
+            rng.gen_range(vel_range.clone()),
+        )),
+        ..default()
+    });
 
     for _ in 0..NUM_ENEMIES {
         let position = Vec3::new(
@@ -58,7 +73,7 @@ fn move_enemy(
     time: Res<Time>,
     mut query: Query<(&mut Transform, &Velocity), With<Enemy>>
 ) {
-    for (mut transform, velocity)  in &mut query {
+    for (mut transform, velocity) in &mut query {
         transform.translation += velocity.0 * time.delta().as_secs_f32();
     }
 }

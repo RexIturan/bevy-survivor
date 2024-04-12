@@ -2,6 +2,7 @@ mod tutorial;
 mod enemy;
 mod camera;
 mod scene;
+mod mesh_instancing;
 
 use bevy::prelude::*;
 use bevy::diagnostic::{

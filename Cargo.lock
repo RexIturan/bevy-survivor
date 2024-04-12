@@ -303,6 +303,7 @@ name = "bevy-survivor"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bytemuck",
  "iyes_perf_ui",
  "rand",
 ]
