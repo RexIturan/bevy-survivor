@@ -4,6 +4,7 @@ mod camera;
 mod scene;
 mod mesh_instancing;
 mod spawner;
+mod item;
 
 use bevy::prelude::*;
 use bevy::diagnostic::{
@@ -11,6 +12,7 @@ use bevy::diagnostic::{
     EntityCountDiagnosticsPlugin,
     SystemInformationDiagnosticsPlugin
 };
+use bevy_rapier3d::prelude::*;
 
 use iyes_perf_ui::prelude::*;
 
@@ -23,6 +25,9 @@ fn main() {
         .add_plugins(EntityCountDiagnosticsPlugin)
         .add_plugins(SystemInformationDiagnosticsPlugin)
 
+        //physics
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
+
         // 3rd party plugins
         .add_plugins(PerfUiPlugin)
         .add_systems(Startup, setup)
@@ -31,6 +36,7 @@ fn main() {
         .add_plugins(scene::ScenePlugin)
         .add_plugins(camera::CameraPlugin)
         .add_plugins(enemy::EnemyPlugin)
+        .add_plugins(item::ItemPlugin)
 
         .run();
 }
