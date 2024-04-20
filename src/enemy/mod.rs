@@ -1,5 +1,6 @@
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use bevy::prelude::*;
+use crate::spawner::PositionIterator;
 
 const NUM_ENEMIES: usize = 10000;
 
@@ -43,14 +44,21 @@ fn setup(
         ..default()
     });
 
-    for _ in 0..NUM_ENEMIES {
+    let (width, height) = (200, 200);
+    let mut position_iter = PositionIterator::new(width, height);
+
+    let count = width * height;
+
+    let pos_offset = Vec2::new(width as f32 / -2., height as f32 / -2.);
+
+    for i in 0..count {
+        let plane_pos = position_iter.next().unwrap() + pos_offset;
+
         let position = Vec3::new(
-            rng.gen_range(pos_range.clone()),
+            plane_pos.x,
             0.5,
-            rng.gen_range(pos_range.clone()),
-        )
-        .normalize()
-            * rng.gen_range(0.2f32..1.0).cbrt();
+            plane_pos.y,
+        );
 
         commands.spawn(EnemyBundle {
             visuals: PbrBundle {
@@ -67,6 +75,31 @@ fn setup(
             ..default()
         });
     }
+
+    // for _ in 0..NUM_ENEMIES {
+    //     let position = Vec3::new(
+    //         rng.gen_range(pos_range.clone()),
+    //         0.5,
+    //         rng.gen_range(pos_range.clone()),
+    //     )
+    //     .normalize()
+    //         * rng.gen_range(0.2f32..1.0).cbrt();
+    //
+    //     commands.spawn(EnemyBundle {
+    //         visuals: PbrBundle {
+    //             mesh: mesh_handle.clone(),
+    //             material: mat_handle.clone(),
+    //             transform: Transform::from_translation(position),
+    //             ..default()
+    //         },
+    //         velocity: Velocity( Vec3::new(
+    //             rng.gen_range(vel_range.clone()),
+    //             0.,
+    //             rng.gen_range(vel_range.clone()),
+    //         )),
+    //         ..default()
+    //     });
+    // }
 }
 
 fn move_enemy(

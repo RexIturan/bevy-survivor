@@ -3,6 +3,7 @@ mod enemy;
 mod camera;
 mod scene;
 mod mesh_instancing;
+mod spawner;
 
 use bevy::prelude::*;
 use bevy::diagnostic::{

@@ -18,3 +18,12 @@ fn setup(
         ..default()
     });
 }
+
+fn zoom_out(
+    time: Res<Time>,
+    mut query: Query<&mut Transform, With<Camera>>
+) {
+    for mut camera in &mut query {
+        camera.translation.y += 1. * time.delta().as_secs_f32();
+    }
+}
