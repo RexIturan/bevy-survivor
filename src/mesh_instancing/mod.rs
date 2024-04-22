@@ -1,5 +1,4 @@
 use bevy::{
-    core_pipeline::core_3d::Transparent3d,
     ecs::{
         query::QueryItem,
         system::{lifetimeless::*, SystemParamItem},
@@ -18,19 +17,21 @@ use bevy::{
         },
         render_resource::*,
         renderer::RenderDevice,
-        view::{ExtractedView, NoFrustumCulling},
+        view::{ExtractedView},
         Render, RenderApp, RenderSet,
     },
 };
+use bevy::core_pipeline::core_3d::Opaque3d;
 use bytemuck::{Pod, Zeroable};
 
-struct MeshInstancingPlugin;
+pub struct MeshInstancingPlugin;
 
 impl Plugin for MeshInstancingPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(ExtractComponentPlugin::<InstanceMaterialData>::default());
+
         app.sub_app_mut(RenderApp)
-            .add_render_command::<Transparent3d, DrawCustom>()
+            .add_render_command::<Opaque3d, DrawCustom>()
             .init_resource::<SpecializedMeshPipelines<CustomPipeline>>()
             .add_systems(
                 Render,
@@ -39,6 +40,7 @@ impl Plugin for MeshInstancingPlugin {
                     prepare_instance_buffers.in_set(RenderSet::PrepareResources),
                 ),
             );
+
     }
 
     fn finish(&self, app: &mut App) {
@@ -48,7 +50,11 @@ impl Plugin for MeshInstancingPlugin {
 
 ///// Components /////
 #[derive(Component, Deref)]
-struct InstanceMaterialData(Vec<InstanceData>);
+pub struct InstanceMaterialData {
+    pub id: u32,
+    #[deref]
+    pub data: Vec<InstanceData>
+}
 
 impl ExtractComponent for InstanceMaterialData {
     type QueryData = &'static InstanceMaterialData;
@@ -56,7 +62,10 @@ impl ExtractComponent for InstanceMaterialData {
     type Out = Self;
 
     fn extract_component(item: QueryItem<'_, Self::QueryData>) -> Option<Self> {
-        Some(InstanceMaterialData(item.0.clone()))
+        Some(InstanceMaterialData {
+            id: item.id,
+            data: item.data.clone()
+        })
     }
 }
 
@@ -68,6 +77,7 @@ struct InstanceBuffer {
 
 ///// Systems /////
 
+
 fn prepare_instance_buffers(
     mut commands: Commands,
     query: Query<(Entity, &InstanceMaterialData)>,
@@ -75,13 +85,13 @@ fn prepare_instance_buffers(
 ) {
     for (entity, instance_data) in &query {
         let buffer = render_device.create_buffer_with_data(&BufferInitDescriptor {
-            label: Some("instance data buffer"),
+            label: Some("Instance data buffer"),
             contents: bytemuck::cast_slice(instance_data.as_slice()),
             usage: BufferUsages::VERTEX | BufferUsages::COPY_DST,
         });
         commands.entity(entity).insert(InstanceBuffer {
             buffer,
-            length: instance_data.len(),
+            length: instance_data.data.len(),
         });
     }
 }
@@ -144,15 +154,15 @@ impl SpecializedMeshPipeline for CustomPipeline {
 
 #[derive(Clone, Copy, Pod, Zeroable)]
 #[repr(C)]
-struct InstanceData {
-    position: Vec3,
-    scale: f32,
-    color: [f32; 4],
+pub struct InstanceData {
+    pub position: Vec3,
+    pub scale: f32,
+    pub color: [f32; 4],
 }
 
 #[allow(clippy::too_many_arguments)]
 fn queue_custom(
-    transparent_3d_draw_functions: Res<DrawFunctions<Transparent3d>>,
+    opaque_3d_draw_functions: Res<DrawFunctions<Opaque3d>>,
     custom_pipeline: Res<CustomPipeline>,
     msaa: Res<Msaa>,
     mut pipelines: ResMut<SpecializedMeshPipelines<CustomPipeline>>,
@@ -160,15 +170,15 @@ fn queue_custom(
     meshes: Res<RenderAssets<Mesh>>,
     render_mesh_instances: Res<RenderMeshInstances>,
     material_meshes: Query<Entity, With<InstanceMaterialData>>,
-    mut views: Query<(&ExtractedView, &mut RenderPhase<Transparent3d>)>,
+    mut views: Query<(&ExtractedView, &mut RenderPhase<Opaque3d>)>,
 ) {
-    let draw_custom = transparent_3d_draw_functions.read().id::<DrawCustom>();
+    let draw_custom = opaque_3d_draw_functions.read().id::<DrawCustom>();
 
     let msaa_key = MeshPipelineKey::from_msaa_samples(msaa.samples());
 
-    for (view, mut transparent_phase) in &mut views {
+    for (view, mut opaque_phase) in &mut views {
         let view_key = msaa_key | MeshPipelineKey::from_hdr(view.hdr);
-        let rangefinder = view.rangefinder3d();
+        // let rangefinder = view.rangefinder3d();
         for entity in &material_meshes {
             let Some(mesh_instance) = render_mesh_instances.get(&entity) else {
                 continue;
@@ -180,12 +190,12 @@ fn queue_custom(
             let pipeline = pipelines
                 .specialize(&pipeline_cache, &custom_pipeline, key, &mesh.layout)
                 .unwrap();
-            transparent_phase.add(Transparent3d {
+
+            opaque_phase.add(Opaque3d {
+                asset_id: Default::default(),
                 entity,
                 pipeline,
                 draw_function: draw_custom,
-                distance: rangefinder
-                    .distance_translation(&mesh_instance.transforms.transform.translation),
                 batch_range: 0..1,
                 dynamic_offset: None,
             });

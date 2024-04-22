@@ -16,11 +16,11 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     //floor
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0)),
-        material: materials.add(Color::rgb(0.3, 0.3, 0.3)),
-        ..default()
-    });
+    // commands.spawn(PbrBundle {
+    //     mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0)),
+    //     material: materials.add(Color::rgb(0.3, 0.3, 0.3)),
+    //     ..default()
+    // });
 
     //todo idk in what direction the light is looking
     commands.spawn(DirectionalLightBundle {

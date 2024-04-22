@@ -28,7 +28,7 @@ fn setup(
     let mesh_handle = meshes.add(Cuboid::new(0.5, 0.5, 0.5));
     let mat_handle = materials.add(Color::BLUE);
 
-    let (width, height) = (100, 200);
+    let (width, height) = (1, 1);
     let mut position_iter = PositionIterator::new(width, height);
 
     let count = width * height;

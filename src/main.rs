@@ -5,6 +5,7 @@ mod scene;
 mod mesh_instancing;
 mod spawner;
 mod item;
+mod stress_test;
 
 use bevy::prelude::*;
 use bevy::diagnostic::{
@@ -35,9 +36,14 @@ fn main() {
         // own plugins
         .add_plugins(scene::ScenePlugin)
         .add_plugins(camera::CameraPlugin)
-        .add_plugins(enemy::EnemyPlugin)
+        // .add_plugins(enemy::EnemyPlugin)
         .add_plugins(item::ItemPlugin)
 
+        //mesh instancing
+        .add_plugins(mesh_instancing::MeshInstancingPlugin)
+
+        .add_plugins(stress_test::StressTestPlugin)
+        
         .run();
 }
 

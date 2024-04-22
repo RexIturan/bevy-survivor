@@ -12,8 +12,8 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Startup, setup)
-            .add_systems(Update, move_enemy);
+            .add_systems(Startup, setup);
+            // .add_systems(Update, move_enemy);
     }
 }
 
@@ -31,7 +31,7 @@ fn setup(
     let mesh_handle = meshes.add(Cuboid::new(1.0, 1.0, 1.0));
     let mat_handle = materials.add(Color::CRIMSON);
 
-    let (width, height) = (100, 20);
+    let (width, height) = (100, 100);
     let mut position_iter = PositionIterator::new(width, height);
 
     let count = width * height;
@@ -71,7 +71,7 @@ fn setup(
                 ..default()
             })
             .insert(Mass(1.))
-            .insert(Friction::new(0.))
+            .insert(Friction::new(1.))
             // .insert(Collider::cuboid(0.5, 0.5, 0.5))
             .insert(Collider::ball(0.5));
 
